@@ -1,0 +1,11 @@
+ruin_app/target/
+**/target/
+
+ruin_ext/bin/
+ruin_ext/obj/
+**/bin/
+**/obj/
+
+# File tambahan
+plan_maybe.md
+.DS_Store
