@@ -1,4 +1,3 @@
-```markdown
 # 🌊 Oxichat
 
 An ultra-lightweight, high-performance, distributed Local AI CLI developer assistant. **Oxichat** operates as a native client that offloads heavy LLM inference workloads (e.g., Gemma, Qwen) to a dedicated local GPU host server running a Koboldcpp API endpoint, completely bypassing high local resource consumption.
@@ -22,7 +21,6 @@ graph LR
     A -- HTTP POST Request <br> Direct Local Network Call --> B
     B -- JSON Response --> A
 
-```
 
 ### Component Breakdown
 
