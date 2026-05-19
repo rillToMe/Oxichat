@@ -6,6 +6,7 @@ use std::io::{self, Write};
 use std::os::raw::c_char;
 use clap::Parser;
 use libloading::{Library, Symbol};
+use std::process::Command;
 
 #[derive(Parser, Debug)]
 struct Args {
@@ -84,8 +85,42 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             break;
         }
 
-        if input_trim.is_empty() {
-            continue;
+        if input_trim.starts_with("/read ") {
+            let file_path = input_trim.trim_start_matches("/read ").trim();
+            println!("\x1b[33m Membaca file menggunakan plugin native: {}\x1b[0m", file_path);
+
+            // Deteksi OS otomatis
+            #[cfg(target_os = "windows")]
+            let plugin_cmd = "../plugins/read_project_plugin.exe";
+            
+            #[cfg(not(target_os = "windows"))]
+            let plugin_cmd = "../plugins/read_project_plugin";
+
+            let output = Command::new(plugin_cmd)
+                .arg(file_path)
+                .output();
+
+            match output {
+                Ok(out) if out.status.success() => {
+                    let file_content = String::from_utf8_lossy(&out.stdout);
+                    println!("\x1b[32m✅ File berhasil digabungkan ke memori AI!\x1b[0m\n");
+
+                    // gabungkan isi file ke memori AI sebagai context (system prompt)
+                    history.push(Message {
+                        role: "system".to_string(),
+                        content: format!("Konteks dari file lokal user:\n{}", file_content),
+                    });
+                }
+                Ok(out) => {
+                    let err_msg = String::from_utf8_lossy(&out.stderr);
+                    println!("\x1b[31m Plugin Error:\x1b[0m {}\n", err_msg);
+                }
+                Err(e) => {
+                    println!("\x1b[31m Gagal mengeksekusi plugin binary:\x1b[0m {}\n", e);
+                }
+            }
+            // Lewati pengiriman HTTP ke AI, kembali minta input user selanjutnya
+            continue; 
         }
 
         history.push(Message {

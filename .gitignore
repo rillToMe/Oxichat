@@ -6,6 +6,12 @@ ruin_ext/obj/
 **/bin/
 **/obj/
 
+plugins/node_modules/
+**/node_modules/
+
 # File tambahan
 plan_maybe.md
 .DS_Store
+
+read_project_plugin.exe
+ruin_ext.dll

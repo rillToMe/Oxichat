@@ -6,11 +6,9 @@ namespace RuinExt;
 
 public class Processor
 {
-    //  Menerima teks dari Rust, memprosesnya, dan mengembalikan pointer
     [UnmanagedCallersOnly(EntryPoint = "ansi_syntax_highlighter")]
     public static IntPtr AnsiSyntaxHighlighter(IntPtr textPtr)
     {
-        // Tangkap pointer dari Rust dan ubah jadi string C#
         string? input = Marshal.PtrToStringAnsi(textPtr);
         
         if (string.IsNullOrEmpty(input)) 
@@ -18,25 +16,27 @@ public class Processor
             return IntPtr.Zero;
         }
 
-        // LOGIC PEMROSESAN TEKS
-        
-        // Warna ANSI
+        // Warna ANSI Terminal
         string reset = "\x1b[0m";
-        string colorCyan = "\x1b[36m";   // Untuk kode (backtick)
-        string colorYellow = "\x1b[33m"; // Untuk bold (**)
+        string colorGreen = "\x1b[32m";  // Untuk isi di dalam Code Block
+        string colorCyan = "\x1b[36m";   // Untuk Inline Code
+        string colorYellow = "\x1b[33m"; // Untuk Bold (**)
         
         string processed = input;
 
-        // Regex untuk Bold (**teks**)
+        // 1. REGEX UNTUK CODE BLOCK (```code```)
+        processed = Regex.Replace(processed, @"```[a-zA-Z]*\r?\n?(.*?)\r?\n?```", 
+            $"{colorGreen}$1{reset}", RegexOptions.Singleline);
+
+        // REGEX UNTUK BOLD (**teks**)
         processed = Regex.Replace(processed, @"\*\*(.*?)\*\*", $"{colorYellow}$1{reset}");
         
-        // Regex untuk Inline Code (`kode`)
+        // REGEX UNTUK INLINE CODE (`kode`)
         processed = Regex.Replace(processed, @"\`(.*?)\`", $"{colorCyan}$1{reset}");
 
         return Marshal.StringToHGlobalAnsi(processed);
     }
 
-    // mencegah Memory Leak
     [UnmanagedCallersOnly(EntryPoint = "free_csharp_string")]
     public static void FreeCSharpString(IntPtr ptr)
     {
