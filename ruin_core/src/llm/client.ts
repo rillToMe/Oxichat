@@ -1,16 +1,27 @@
 import { type AppConfig } from '../config/index.js';
 
-export async function* askLLMStream(prompt: string, config: AppConfig, dynamicContext: string): AsyncGenerator<string, void, unknown> {
-    const apiUrl = `http://${config.llm_host}:${config.llm_port}/v1/chat/completions`;
+export interface ChatMessage {
+    role: 'system' | 'user' | 'assistant';
+    content: string;
+}
 
-    // Gabungkan prompt sistem bawaan dengan konteks hasil Rust
+export async function* askLLMStream(
+    history: ChatMessage[],
+    config: AppConfig, 
+    dynamicContext: string
+): AsyncGenerator<string, void, unknown> {
+    
+    const apiUrl = `http://${config.llm_host}:${config.llm_port}/v1/chat/completions`;
     const injectedSystemPrompt = `${config.system_prompt}\n\n[SYSTEM CONTEXT]\n${dynamicContext}`;
 
+    // Susun payload
+    const messages = [
+        { role: "system", content: injectedSystemPrompt },
+        ...history
+    ];
+
     const payload = {
-        messages: [
-            { role: "system", content: injectedSystemPrompt },
-            { role: "user", content: prompt }
-        ],
+        messages: messages,
         temperature: 0.7,
         max_tokens: 1024,
         stream: true
