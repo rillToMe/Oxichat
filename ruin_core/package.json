@@ -9,10 +9,15 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "devDependencies": {
-    "@types/node": "^25.9.0",
+    "@types/node": "^25.9.1",
     "tsx": "^4.22.3",
     "typescript": "^6.0.3"
-  }
+  },
+  "dependencies": {
+    "enquirer": "^2.4.1",
+    "esbuild": "^0.28.0",
+    "undici-types": "^7.24.6"
+  },
+  "description": ""
 }
