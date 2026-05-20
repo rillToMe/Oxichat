@@ -577,4 +577,7 @@ if (!nativeBinding) {
 
 module.exports = nativeBinding
 module.exports.gatherContext = nativeBinding.gatherContext
+module.exports.initDb = nativeBinding.initDb
+module.exports.loadHistory = nativeBinding.loadHistory
 module.exports.readFile = nativeBinding.readFile
+module.exports.saveMessage = nativeBinding.saveMessage

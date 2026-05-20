@@ -2,4 +2,10 @@
 /* eslint-disable */
 export declare function gatherContext(path: string): string
 
+export declare function initDb(): string
+
+export declare function loadHistory(workspace: string, limit: number): string
+
 export declare function readFile(filePath: string): string
+
+export declare function saveMessage(workspace: string, role: string, content: string): boolean

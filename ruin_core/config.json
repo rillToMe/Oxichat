@@ -1,5 +1,5 @@
 {
-    "llm_host": "43.156.70.116",
+    "llm_host": "192.168.43.229",
     "llm_port": 5001,
     "system_prompt": "You are Oxichat, an ultra-fast, intelligent, and highly capable CLI AI assistant. Provide concise and accurate answers."
 }
