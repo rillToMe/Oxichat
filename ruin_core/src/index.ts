@@ -1,38 +1,42 @@
-import enquirer from 'enquirer';
-const { prompt } = enquirer;
+import { loadConfig } from './config/index.js';
+import { askLLM } from './llm/client.js';
+import { askUserInput } from './ui/repl.js';
+
 import { processText, gatherContext } from '../../ruin_plugins/index.js';
 
 async function main() {
     console.clear();
-    console.log("🚀 Oxichat CLI Started!\n");
+    console.log("Oxichat CLI loading Konfigurasi...\n");
     
-    // 1. Panggil Rust untuk baca context (Simulasi)
-    const contextMsg = gatherContext("./ruin_core");
-    console.log(`\x1b[33m[Context Gatherer]\x1b[0m ${contextMsg}\n`);
+    // Load Konfigurasi
+    const config = await loadConfig();
+    console.log(`\x1b[32m[Config Loaded]\x1b[0m Target LLM: http://${config.llm_host}:${config.llm_port}`);
 
-    // 2. Interactive REPL Loop
+    const contextMsg = gatherContext("./");
+    console.log(`\x1b[33m[Context]\x1b[0m ${contextMsg}\n`);
+
     while (true) {
         try {
-            const response: { userInput: string } = await prompt({
-                type: 'input',
-                name: 'userInput',
-                message: 'Ketik sesuatu (mengandung kata "rust") atau "exit":'
-            });
+            const input = await askUserInput();
 
-            if (response.userInput.toLowerCase() === 'exit') {
+            if (input.toLowerCase() === 'exit' || input.toLowerCase() === 'quit') {
                 console.log("Sampai jumpa!");
                 break;
             }
 
-            // 3. Lempar input TS ke modul Rust Native!
-            const result = processText(response.userInput);
+            // Tampilkan indikator memproses
+            console.log("\x1b[90mAI sedang berpikir...\x1b[0m");
+
+            // Tembak ke LLM
+            const llmResponse = await askLLM(input, config);
             
-            // 4. Render hasilnya di terminal
-            console.log(`\n${result}\n`);
+            // Proses teks balasan AI menggunakan otot Rust
+            const processedResponse = processText(llmResponse);
+            
+            console.log(`\n\x1b[35m[Oxichat]\x1b[0m: ${processedResponse}\n`);
             
         } catch (error) {
-            // Tangkap Ctrl+C
-            console.log("\nSesi diakhiri.");
+            console.log("\nSesi diakhiri oleh sistem (Ctrl+C).");
             break;
         }
     }
