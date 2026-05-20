@@ -577,4 +577,4 @@ if (!nativeBinding) {
 
 module.exports = nativeBinding
 module.exports.gatherContext = nativeBinding.gatherContext
-module.exports.processText = nativeBinding.processText
+module.exports.readFile = nativeBinding.readFile

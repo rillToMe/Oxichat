@@ -2,4 +2,4 @@
 /* eslint-disable */
 export declare function gatherContext(path: string): string
 
-export declare function processText(input: string): string
+export declare function readFile(filePath: string): string
